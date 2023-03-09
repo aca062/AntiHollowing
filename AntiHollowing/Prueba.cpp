@@ -20,11 +20,11 @@ void sCreateProcessNotifyRoutine(HANDLE ppid, HANDLE pid, BOOLEAN create)
 		PsLookupProcessByProcessId(pid, &process);
 		SeLocateProcessImageName(process, &processName);
 
-		DbgPrint("%d %wZ\n\t\t%d %wZ", ppid, parentProcessName, pid, processName);
+		//DbgPrint("%d %wZ\n\t\t%d %wZ", ppid, parentProcessName, pid, processName);
 	}
 	else
 	{
-		DbgPrint("Process %d lost child %d", ppid, pid);
+		//DbgPrint("Process %d lost child %d", ppid, pid);
 	}
 }
 
@@ -35,11 +35,13 @@ void sCreateProcessNotifyRoutineEx(PEPROCESS process, HANDLE pid, PPS_CREATE_NOT
 
 	if (createInfo != NULL)
 	{
-		if (wcsstr(createInfo->CommandLine->Buffer, L"notepad") != NULL)
+		/*if (createInfo->Flags & CREATE_SUSPENDED)
 		{
 			DbgPrint("[!] Access to launch notepad.exe was denied!");
 			createInfo->CreationStatus = STATUS_ACCESS_DENIED;
-		}
+		}*/
+
+		DbgPrint(("%llu"), createInfo->Flags);
 	}
 }
 
