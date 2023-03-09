@@ -2,8 +2,8 @@
 #include <ntddk.h>
 #include <wdm.h>
 
-DRIVER_DISPATCH HandleCustomIOCTL;
-#define IOCTL_SPOTLESS CTL_CODE(FILE_DEVICE_UNKNOWN, 0x2049, METHOD_BUFFERED, FILE_ANY_ACCESS)
+//DRIVER_DISPATCH HandleCustomIOCTL;
+//#define IOCTL_SPOTLESS CTL_CODE(FILE_DEVICE_UNKNOWN, 0x2049, METHOD_BUFFERED, FILE_ANY_ACCESS)
 UNICODE_STRING DEVICE_NAME = RTL_CONSTANT_STRING(L"\\Device\\SpotlessDevice");
 UNICODE_STRING DEVICE_SYMBOLIC_NAME = RTL_CONSTANT_STRING(L"\\??\\SpotlessDeviceLink");
 
@@ -77,7 +77,7 @@ void DriverUnload(PDRIVER_OBJECT dob)
 	PsSetCreateProcessNotifyRoutineEx(sCreateProcessNotifyRoutineEx, TRUE);
 }
 
-NTSTATUS HandleCustomIOCTL(PDEVICE_OBJECT DeviceObject, PIRP Irp)
+/*NTSTATUS HandleCustomIOCTL(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 {
 	UNREFERENCED_PARAMETER(DeviceObject);
 	PIO_STACK_LOCATION stackLocation = NULL;
@@ -100,9 +100,9 @@ NTSTATUS HandleCustomIOCTL(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 	IoCompleteRequest(Irp, IO_NO_INCREMENT);
 
 	return STATUS_SUCCESS;
-}
+}*/
 
-NTSTATUS MajorFunctions(PDEVICE_OBJECT DeviceObject, PIRP Irp)
+/*NTSTATUS MajorFunctions(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 {
 	UNREFERENCED_PARAMETER(DeviceObject);
 
@@ -126,7 +126,7 @@ NTSTATUS MajorFunctions(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 	IoCompleteRequest(Irp, IO_NO_INCREMENT);
 
 	return STATUS_SUCCESS;
-}
+}*/
 
 extern "C" NTSTATUS
 DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
@@ -140,11 +140,11 @@ DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 	DriverObject->DriverUnload = DriverUnload;
 
 	// routine for handling IO requests from userland
-	DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = HandleCustomIOCTL;
+	//DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = HandleCustomIOCTL;
 
 	// routines that will execute once a handle to our device's symbolik link is opened/closed
-	DriverObject->MajorFunction[IRP_MJ_CREATE] = MajorFunctions;
-	DriverObject->MajorFunction[IRP_MJ_CLOSE] = MajorFunctions;
+	//DriverObject->MajorFunction[IRP_MJ_CREATE] = MajorFunctions;
+	//DriverObject->MajorFunction[IRP_MJ_CLOSE] = MajorFunctions;
 
 	DbgPrint("Driver loaded");
 
