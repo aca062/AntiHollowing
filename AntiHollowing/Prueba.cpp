@@ -1,13 +1,13 @@
 #include <Ntifs.h>
 #include <ntddk.h>
-#include <DbgHelp.h>
-#include <windows.h>
 #include <wdm.h>
+constexpr auto CREATE_SUSPENDED = 0x00000004;;
 
 //DRIVER_DISPATCH HandleCustomIOCTL;
 //#define IOCTL_SPOTLESS CTL_CODE(FILE_DEVICE_UNKNOWN, 0x2049, METHOD_BUFFERED, FILE_ANY_ACCESS)
 UNICODE_STRING DEVICE_NAME = RTL_CONSTANT_STRING(L"\\Device\\SpotlessDevice");
 UNICODE_STRING DEVICE_SYMBOLIC_NAME = RTL_CONSTANT_STRING(L"\\??\\SpotlessDeviceLink");
+
 
 /*void UnmappingNotif(
 	DEBUG_EVENT* DebugEvent
@@ -27,7 +27,7 @@ UNICODE_STRING DEVICE_SYMBOLIC_NAME = RTL_CONSTANT_STRING(L"\\??\\SpotlessDevice
 	}
 }*/
 
-LONG WINAPI UnmappingNotif(EXCEPTION_POINTERS* ExceptionInfo)
+/*LONG WINAPI UnmappingNotif(EXCEPTION_POINTERS* ExceptionInfo)
 {
 	DWORD processId = GetCurrentProcessId();
 
@@ -48,7 +48,7 @@ LONG WINAPI UnmappingNotif(EXCEPTION_POINTERS* ExceptionInfo)
 
 	// Return EXCEPTION_CONTINUE_SEARCH to allow the default exception handling to proceed
 	return EXCEPTION_CONTINUE_SEARCH;
-}
+}*/
 
 void sCreateProcessNotifyRoutine(HANDLE ppid, HANDLE pid, BOOLEAN create)
 {
@@ -118,18 +118,18 @@ void sLoadImageNotifyRoutine(PUNICODE_STRING imageName, HANDLE pid, PIMAGE_INFO 
 	PsLookupProcessByProcessId(pid, &process);
 	SeLocateProcessImageName(process, &processName);
 
-	//DbgPrint("%wZ (%d) loaded %wZ", processName, pid, imageName);
+	DbgPrint("%wZ (%d) loaded %wZ", processName, pid, imageName);
 }
 
 void sCreateThreadNotifyRoutine(HANDLE pid, HANDLE tid, BOOLEAN create)
 {
 	if (create)
 	{
-		//DbgPrint("%d created thread %d", pid, tid);
+		DbgPrint("%d created thread %d", pid, tid);
 	}
 	else
 	{
-		//DbgPrint("Thread %d of process %d exited", tid, pid);
+		DbgPrint("Thread %d of process %d exited", tid, pid);
 	}
 }
 
@@ -205,7 +205,7 @@ DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 
 	// routine that will execute when our driver is unloaded/service is stopped
 	DriverObject->DriverUnload = DriverUnload;
-	SetUnhandledExceptionFilter(UnmappingNotif);
+	//SetUnhandledExceptionFilter(UnmappingNotif);
 
 	// routine for handling IO requests from userland
 	//DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = HandleCustomIOCTL;
