@@ -1,6 +1,9 @@
-#include <windows.h>
+/*#include <windows.h>
 #include <DbgHelp.h>
+
 #pragma comment(lib, "kernel32.lib")
+
+#include <libloaderapi.h>
 
 void UnmappingNotif(DEBUG_EVENT* DebugEvent)
 {
@@ -16,4 +19,4 @@ void UnmappingNotif(DEBUG_EVENT* DebugEvent)
 		}
 		break;
 	}
-}
+}*/

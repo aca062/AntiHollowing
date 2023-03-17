@@ -1,12 +1,12 @@
 #include <Ntifs.h>
 #include <ntddk.h>
 #include <wdm.h>
-constexpr auto CREATE_SUSPENDED = 0x00000004;;
+constexpr auto CREATE_SUSPENDED = 0x00000004;
 
 //DRIVER_DISPATCH HandleCustomIOCTL;
 //#define IOCTL_SPOTLESS CTL_CODE(FILE_DEVICE_UNKNOWN, 0x2049, METHOD_BUFFERED, FILE_ANY_ACCESS)
-UNICODE_STRING DEVICE_NAME = RTL_CONSTANT_STRING(L"\\Device\\SpotlessDevice");
-UNICODE_STRING DEVICE_SYMBOLIC_NAME = RTL_CONSTANT_STRING(L"\\??\\SpotlessDeviceLink");
+UNICODE_STRING DEVICE_NAME = RTL_CONSTANT_STRING(L"\\Device\\AntiHollowing");
+UNICODE_STRING DEVICE_SYMBOLIC_NAME = RTL_CONSTANT_STRING(L"\\??\\AntiHollowingLink");
 
 
 /*void UnmappingNotif(
@@ -221,7 +221,7 @@ DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 	//PsSetLoadImageNotifyRoutine(sLoadImageNotifyRoutine);
 	//PsSetCreateThreadNotifyRoutine(sCreateThreadNotifyRoutine);
 	PsSetCreateProcessNotifyRoutineEx(sCreateProcessNotifyRoutineEx, FALSE);
-	DbgPrint("Listeners isntalled..");
+	DbgPrint("Listeners installed..");
 
 	IoCreateDevice(DriverObject, 0, &DEVICE_NAME, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &DriverObject->DeviceObject);
 	if (!NT_SUCCESS(status))
