@@ -1,13 +1,66 @@
-#include <Ntifs.h>
+#include <ntifs.h>
 #include <ntddk.h>
 #include <wdm.h>
+#include <windef.h>
+#pragma comment (lib, "ntoskrnl.lib")
+
 constexpr auto CREATE_SUSPENDED = 0x00000004;
+
+typedef NTSTATUS(WINAPI* ZWQUERYINFORMATIONPROCESS)(
+	IN HANDLE ProcessHandle,
+	IN PROCESSINFOCLASS ProcessInformationClass,
+	OUT PVOID ProcessInformation,
+	IN ULONG ProcessInformationLength,
+	OUT PULONG ReturnLength OPTIONAL
+	);
 
 //DRIVER_DISPATCH HandleCustomIOCTL;
 //#define IOCTL_SPOTLESS CTL_CODE(FILE_DEVICE_UNKNOWN, 0x2049, METHOD_BUFFERED, FILE_ANY_ACCESS)
 UNICODE_STRING DEVICE_NAME = RTL_CONSTANT_STRING(L"\\Device\\AntiHollowing");
 UNICODE_STRING DEVICE_SYMBOLIC_NAME = RTL_CONSTANT_STRING(L"\\??\\AntiHollowingLink");
 
+void sCreateProcessNotifyRoutine(HANDLE ppid, HANDLE pid, BOOLEAN create)
+{
+	//PROCESS_BASIC_INFORMATION ProcessInfo;
+	//ULONG ReturnLength;
+	//NTSTATUS Status;
+
+	UNICODE_STRING FunctionName = RTL_CONSTANT_STRING(L"ZwQueryInformationProcess");
+
+	PVOID FunctionAddress = MmGetSystemRoutineAddress(&FunctionName);
+
+	if (FunctionAddress == NULL)
+	{
+		// failed to obtain the address of ZwQueryInformationProcess
+		DbgPrint("ZwQueryInformationProcess no conseguida");
+	}
+	else {
+		// succeed to obtain the address of ZwQueryInformationProcess
+
+	}
+
+	if (create)
+	{
+		PEPROCESS process = NULL;
+		PUNICODE_STRING parentProcessName = NULL, processName = NULL;
+		//ULONG ProcessFlags;
+
+		PsLookupProcessByProcessId(ppid, &process);
+		SeLocateProcessImageName(process, &parentProcessName);
+
+		PsLookupProcessByProcessId(pid, &process);
+		SeLocateProcessImageName(process, &processName);
+
+		//ProcessFlags = process->Flags;
+
+		DbgPrint("%d %wZ\n\t\t%d %wZ", ppid, parentProcessName, pid, processName);
+	}
+	else
+	{
+
+		//DbgPrint("Process %d lost child %d", ppid, pid);
+	}
+}
 
 /*void UnmappingNotif(
 	DEBUG_EVENT* DebugEvent
@@ -49,27 +102,6 @@ UNICODE_STRING DEVICE_SYMBOLIC_NAME = RTL_CONSTANT_STRING(L"\\??\\AntiHollowingL
 	// Return EXCEPTION_CONTINUE_SEARCH to allow the default exception handling to proceed
 	return EXCEPTION_CONTINUE_SEARCH;
 }*/
-
-void sCreateProcessNotifyRoutine(HANDLE ppid, HANDLE pid, BOOLEAN create)
-{
-	if (create)
-	{
-		PEPROCESS process = NULL;
-		PUNICODE_STRING parentProcessName = NULL, processName = NULL;
-
-		PsLookupProcessByProcessId(ppid, &process);
-		SeLocateProcessImageName(process, &parentProcessName);
-
-		PsLookupProcessByProcessId(pid, &process);
-		SeLocateProcessImageName(process, &processName);
-
-		DbgPrint("%d %wZ\n\t\t%d %wZ", ppid, parentProcessName, pid, processName);
-	}
-	else
-	{
-		//DbgPrint("Process %d lost child %d", ppid, pid);
-	}
-}
 
 void sCreateProcessNotifyRoutineEx(PEPROCESS process, HANDLE pid, PPS_CREATE_NOTIFY_INFO createInfo)
 {
@@ -138,10 +170,10 @@ void DriverUnload(PDRIVER_OBJECT dob)
 	DbgPrint("Driver unloaded, deleting symbolic links and devices");
 	IoDeleteDevice(dob->DeviceObject);
 	IoDeleteSymbolicLink(&DEVICE_SYMBOLIC_NAME);
-	//PsSetCreateProcessNotifyRoutine(sCreateProcessNotifyRoutine, TRUE);
+	PsSetCreateProcessNotifyRoutine(sCreateProcessNotifyRoutine, TRUE);
 	//PsRemoveLoadImageNotifyRoutine(sLoadImageNotifyRoutine);
 	//PsRemoveCreateThreadNotifyRoutine(sCreateThreadNotifyRoutine);
-	PsSetCreateProcessNotifyRoutineEx(sCreateProcessNotifyRoutineEx, TRUE);
+	//PsSetCreateProcessNotifyRoutineEx(sCreateProcessNotifyRoutineEx, TRUE);
 }
 
 /*NTSTATUS HandleCustomIOCTL(PDEVICE_OBJECT DeviceObject, PIRP Irp)
@@ -217,10 +249,10 @@ DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 	DbgPrint("Driver loaded");
 
 	// subscribe to notifications
-	//PsSetCreateProcessNotifyRoutine(sCreateProcessNotifyRoutine, FALSE);
+	PsSetCreateProcessNotifyRoutine(sCreateProcessNotifyRoutine, FALSE);
 	//PsSetLoadImageNotifyRoutine(sLoadImageNotifyRoutine);
 	//PsSetCreateThreadNotifyRoutine(sCreateThreadNotifyRoutine);
-	PsSetCreateProcessNotifyRoutineEx(sCreateProcessNotifyRoutineEx, FALSE);
+	//PsSetCreateProcessNotifyRoutineEx(sCreateProcessNotifyRoutineEx, FALSE);
 	DbgPrint("Listeners installed..");
 
 	IoCreateDevice(DriverObject, 0, &DEVICE_NAME, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &DriverObject->DeviceObject);

@@ -139,6 +139,9 @@
     <Link>
       <AdditionalDependencies>DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ClCompile>
+      <AdditionalOptions>/kernel %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <DriverSign>
@@ -147,6 +150,9 @@
     <Link>
       <AdditionalDependencies>DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ClCompile>
+      <AdditionalOptions>/kernel %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DriverSign>
